@@ -9,8 +9,8 @@ for i=1:floor(Tsim/simTs)
     if(rem(i,ctrl_exec_freq)==1)
         % Reference
         X_ref= ref.x_ref(j+1); Y_ref= ref.y_ref(j+1); psi_ref= ref.psi_ref(j+1);
-        v_ref= ref.v_ref(j+1:j+max(lat_mpc.N,lon_mpc.N)+1);
-        kappa_ref= ref.curvature_ref(j+1:j+max(lat_mpc.N,lon_mpc.N)+1);
+        v_ref= ref.v_ref(j+1:j+lon_mpc.N+1);
+        kappa_ref= ref.curvature_ref(j+1:j+lon_mpc.N+1);
 
         v_ref_curr= ref.v_ref(j); kappa_ref_curr= ref.curvature_ref(j);
 
@@ -23,7 +23,7 @@ for i=1:floor(Tsim/simTs)
         err_mrac_vec(:,j)= X_MRAC_vec(:,j)-X_MRAC_bar_vec(:,j);
         tStart=cputime;
         delta_cmd= mrac.Ky'*X_MRAC_vec(:,j)+mrac.Ke'*err_mrac_vec(:,j);
-        delta_cmd= delta_cmd+mrac.Kdel*delta_cmd_og;%+mrac.Kdel*
+        delta_cmd= delta_cmd+mrac.Kdel*delta_cmd_og;
         time_mrac1_end=cputime - tStart;
         gains_MRAC_vec(:,j)= [mrac.Kdel;mrac.Ky;mrac.Ke];
 
@@ -44,10 +44,10 @@ for i=1:floor(Tsim/simTs)
         tau_f_cmd= ((lon_mpc.sys_params.m*ax_cmd)/2)*lon_mpc.sys_params.Rw;
         tau_r_cmd= tau_f_cmd;
         tStart = cputime;
-        X_MRAC_bar_vec(:,j+1)= propagate_error_dynamics(lat_mpc.sys_params,xDot,controlTs, ...
+        X_MRAC_bar_vec(:,j+1)= propagate_error_dynamics(lat_control_params,xDot,controlTs, ...
             X_MRAC_vec(:,j),v_ref_curr*kappa_ref_curr,delta_cmd_og);
         
-        mrac= mrac.updateMRACgains(lat_mpc.sys_params,...
+        mrac= mrac.updateMRACgains(lat_control_params,...
             X_MRAC_vec(:,j),err_mrac_vec(:,j), ...
             xDot,delta_cmd);
         time_mrac2_end=cputime - tStart;

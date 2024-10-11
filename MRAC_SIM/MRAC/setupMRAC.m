@@ -1,18 +1,25 @@
 function params = setupMRAC(vehicle,Vx,Ts)
-    
+
+    m= vehicle.m;
+    C_f= vehicle.C_f;
+    C_r= vehicle.C_r;
+    I_z = vehicle.I_z;
+    l_f= vehicle.l_f;
+    l_r= vehicle.l_r;
+
     Ac =   [0                  1                                            0                                     0                                                              ;...
-        0  -(2*(vehicle.C_f+vehicle.C_r)/(vehicle.m*Vx))                     2*(vehicle.C_f+vehicle.C_r)/vehicle.m             -2*(vehicle.C_f*vehicle.l_f-vehicle.C_r*vehicle.l_r)/(vehicle.m*Vx)                     ;...
+        0  -(2*(C_f+C_r)/(m*Vx))                     2*(C_f+C_r)/m             -2*(C_f*l_f-C_r*l_r)/(m*Vx)                     ;...
         0                  0                                            0                                     1                                                              ;...
-        0  -(2*(vehicle.C_f*vehicle.l_f-vehicle.C_r*vehicle.l_r)/(vehicle.I_z*Vx))    2*(vehicle.C_f*vehicle.l_f-vehicle.C_r*vehicle.l_r)/vehicle.I_z    -(2*(vehicle.C_f*vehicle.l_f^2+vehicle.C_r*vehicle.l_r^2)/(vehicle.I_z*Vx))   ];
+        0  -(2*(C_f*l_f-C_r*l_r)/(I_z*Vx))    2*(C_f*l_f-C_r*l_r)/I_z    -(2*(C_f*l_f^2+C_r*l_r^2)/(I_z*Vx))   ];
     
-    Bc            = [0; 2*vehicle.C_f/vehicle.m  ; 0;  2*vehicle.C_f*vehicle.l_f/vehicle.I_z];
+    Bc            = [0; 2*C_f/m  ; 0;  2*C_f*l_f/I_z];
 
 
     Cc= eye(4);
 
     Dc= zeros(4,1);
 
-    Gc= [0  ;  -Vx-(2*(vehicle.C_f*vehicle.l_f-vehicle.C_r*vehicle.l_r))/(vehicle.m*Vx)  ;  0  ; -(2*(vehicle.C_f*vehicle.l_f^2+vehicle.C_r*vehicle.l_r^2))/(vehicle.I_z*Vx)];
+    Gc= [0  ;  -Vx-(2*(C_f*l_f-C_r*l_r))/(m*Vx)  ;  0  ; -(2*(C_f*l_f^2+C_r*l_r^2))/(I_z*Vx)];
 
     [params.A,params.B,~,~] = ssdata(c2d(ss(Ac,Bc,Cc,Dc),Ts));
     factor= 5e-2;%5e-2;
