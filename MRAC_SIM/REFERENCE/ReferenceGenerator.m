@@ -2,13 +2,10 @@ function ref= ReferenceGenerator(Ts,plotter,scenario)
 
         if scenario==1    
             load("ReferenceRaw_CityScene.mat"); 
-            load("lat_error_oval.mat");
-        elseif scenario==2
+        elseif scenario==3
             load("ReferenceRaw_Figure8.mat");
-            load("lat_error_figure8_60.mat");
         else
             load("ReferenceRaw_Figure8_LowSpeed_Modified.mat");
-            load("lat_error_figure8_45.mat");
         end
         Ts_data= 1/50; % Preferred sample time for reference
         
@@ -80,5 +77,4 @@ function ref= ReferenceGenerator(Ts,plotter,scenario)
         ref.v_ref(end+1:end+200)= ref.v_ref(end);
         ref.curvature_ref(end+1:end+200)= ref.curvature_ref(end);
         ref.a_ref(end+1:end+200)= 0;
-        ref.lat_error=lat_error;
 end

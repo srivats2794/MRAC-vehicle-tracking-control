@@ -14,7 +14,7 @@ for i=1:floor(Tsim/simTs)
 
         v_ref_curr= ref.v_ref(j); kappa_ref_curr= ref.curvature_ref(j);
 
-        delta_cmd_og = atan(plant.l*kappa_ref_curr);
+        delta_cmd_og = feedforward_steering(lat_control_params,xDot,kappa_ref_curr);
             
         X_MRAC_vec(:,j)=calc_error_states(X,Y,psi,psiDot,xDot,yDot,X_ref,Y_ref,psi_ref,kappa_ref(1));
         if j==1

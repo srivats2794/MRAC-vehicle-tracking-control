@@ -1,12 +1,10 @@
-function VehicleSim_startup(scenario,plots)
-
-clc; clear; close all;
+function lat_error = VehicleSim_startup(scenario,plots)
 
 if nargin<2
     plots=1; % Do you want the plots or no?
 end
 if nargin<1
-    scenario=3; % MANIPULATE THE PARAMETER PERTURBATION PERCENTAGE
+    scenario=2; 
 end
 
 addpath("MPC/","PLANT/","MRAC/","REFERENCE/","HELPERS/");
@@ -18,8 +16,8 @@ controlTs = 0.01; % Controller Time Step
 ref=ReferenceGenerator(controlTs,false,scenario); 
 % Ins-> Controller sampling time,plotting reference option, choice between 
 % 1. oval track
-% 2. figure 8 60 kmph
-% 3. figure8 45 kmph 
+% 2. figure 8 45 kmph
+% 3. figure8 60 kmph 
 
 Tsim= ref.t_ref(end); % Simulation time limit
 
@@ -72,11 +70,6 @@ lat_error= calc_LateralDeviation(X_pl_Record(1,:),X_pl_Record(2,:),...
     ref.x_ref,ref.y_ref,X_pl_Record(3,:),...
     simTs,controlTs);
 
-RMS_Ey = ((ref.lat_error.rms-lat_error.rms)/lat_error.rms)*100;
-Max_Ey = ((ref.lat_error.max-lat_error.max)/lat_error.max)*100;
-
-disp(['RMS Lateral Deviation Improvement From EKF-MPC = ' num2str(RMS_Ey)]);
-disp(['Max Lateral Deviation Improvement From EKF-MPC = ' num2str(Max_Ey)]);
 %% Plots
 if plots
    plotter;

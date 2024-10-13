@@ -1,12 +1,12 @@
 classdef MRAC_CONTROLLER
     % A class implementation that encapsulates all the MRAC controller properties and methods 
     
-    
     properties
        gamma_st; 
        gamma_err;
        gamma_in; 
        Q 
+       R
        A
        B
        G
@@ -26,13 +26,13 @@ classdef MRAC_CONTROLLER
             obj.Q= params.Q;
             obj.A= params.A;
             obj.B= params.B;
-            obj.P=eye(4);
+            obj.R=params.R;
+            obj.P=params.Q;
             obj.lambda=params.lambda;
             obj.Ts= params.Ts;
             obj.Ke= params.Ke;
             obj.Kdel= params.Kdel;
             obj.Ky= params.Ky;
-            obj.Ky0 = params.Ky0;
             obj.G= params.G;
         end
         
@@ -46,21 +46,13 @@ classdef MRAC_CONTROLLER
 
             Bc            = [0; 2*vehicle.C_f/vehicle.m  ; 0;  2*vehicle.C_f*vehicle.l_f/vehicle.I_z];
 
-
-            Cc= eye(4);
-
-            Dc= zeros(4,1);
-
             Gc= [0  ;  -Vx-(2*(vehicle.C_f*vehicle.l_f-vehicle.C_r*vehicle.l_r))/(vehicle.m*Vx)  ;  0  ; -(2*(vehicle.C_f*vehicle.l_f^2+vehicle.C_r*vehicle.l_r^2))/(vehicle.I_z*Vx)];
 
-           
+            this.G = Gc;
 
-            this.G = Gc*this.Ts;
-
-            [this.A,this.B,~,~] = ssdata(c2d(ss(Ac,Bc,Cc,Dc),this.Ts));
-            % this.A=Ac;
-            % this.B=Bc;
-            %this.P= dlyap((this.A-this.B*this.Ky0),this.Q);
+             this.A=Ac;
+            this.B=Bc;
+            [this.P,~,~]= icare(this.A,this.B,this.Q,this.R);
 
             Ky_dot= this.gamma_st*meas*err'*this.P*this.B;
             Kdel_dot= this.gamma_in*in*err'*this.P*this.B;
